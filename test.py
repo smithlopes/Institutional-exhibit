@@ -1,67 +1,76 @@
+import datetime as dt
+
+import matplotlib.dates as mdates
+import matplotlib.font_manager as fm
 import numpy as np
-import matplotlib as mpl
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
 
-from institutional_exhibit import Frame  # importing also registers the bundled Inter fonts
+from institutional_exhibit import Frame, usd_bn, inr
 
-# Make tick labels, axis titles and the legend use Inter too
-mpl.rcParams["font.family"] = ["Helvetica", "DejaVu Sans"]
+# ---------- font check: should print Inter files, not DejaVu ----------
+for fam, w in [("Inter", 400), ("Inter ExtraBold", 800)]:
+    print(fam, "->", fm.findfont(fm.FontProperties(family=fam, weight=w),
+                                 fallback_to_default=False))
 
-# ---------- dummy data: Q1 2023 to Q3 2026 ----------
-quarters = [f"Q{q} {y}" for y in range(2023, 2027) for q in range(1, 5)][:15]
-n = len(quarters)
+# ---------- dummy data: Q1 2023 to Q3 2026 (quarter-end dates) ----------
+dates = []
+for y in range(2023, 2027):
+    for m, d in [(3, 31), (6, 30), (9, 30), (12, 31)]:
+        dates.append(dt.date(y, m, d))
+dates = dates[:15]
+n = len(dates)
+x = mdates.date2num(dates)
+
 rng = np.random.default_rng(7)
-
-fca  = 500 + np.cumsum(rng.normal(4, 6, n))
-gold = 40 + np.cumsum(rng.normal(3, 2, n))
-sdr  = 18 + rng.normal(0, 0.2, n)
-rtp  = 4.5 + rng.normal(0, 0.1, n)
-usdinr = 82 + np.cumsum(rng.normal(0.25, 0.3, n))
+fca = np.linspace(505, 630, n) + rng.normal(0, 8, n)
+gold = np.linspace(45, 110, n) + rng.normal(0, 3, n)
+sdr = 18 + rng.normal(0, 0.3, n)
+rtp = 4.5 + rng.normal(0, 0.1, n)
+usdinr = np.linspace(82.3, 95.6, n) + rng.normal(0, 0.5, n)
 
 # ---------- frame ----------
 f = Frame(
     width=1920, height=1080,
     title="India's Foreign Exchange Reserves Composition",
-    subtitle=("Over the period spanning Q1 2023 through Q3 2026, India's overall foreign exchange reserves experienced a sustained expansion, surging by US$XXX.X billion from US$XXX.X billion to US$XXX.X billion. This long-term growth trajectory was primarily fueled by substantial additions to foreign currency assets (FCA) (+US$XXX.X billion) alongside significant valuation gains and strategic acquisitions in gold holdings (+US$XXX.X billion). Over the same multi-year horizon, the USD/INR exchange rate appreciated by X.X% (moving from XX.XX to XX.XX), reflecting broader strength in the US dollar and underlying domestic structural dynamics. Focusing on the latest complete quarter (Q3 2026), foreign reserves grew by US$XX.X billion quarter-on-quarter, driven by robust quarterly inflows in foreign currency assets (+US$XX.X billion) and gold (+US$XX.X billion). As of the week ending DD Month 2026, foreign currency assets continued to dominate the asset allocation mix at XX.X% of total reserves, followed by gold reserves at XX.X%, Special Drawing Rights (SDRs) at X.X%, and India’s Reserve Tranche Position (RTP) in the International Monetary Fund at X.X%."),
-
-    note=("Note: Reserve Bank of India (RBI). The stacked bar chart presents the composition of India’s total official foreign exchange reserves in billions of US Dollars (US$bn), broken down across four key sub-components: Foreign Currency Assets (FCA), Gold, Special Drawing Rights (SDRs), and the Reserve Tranche Position (RTP) with the International Monetary Fund (IMF). Quarterly data points reflect the final published weekly reserve position reported by the RBI within each respective quarter (note that the most recent period may reflect a partial quarter depending on data release schedules). Foreign Currency Assets are expressed in US dollar terms and include the valuation impacts of exchange rate movements in non-US currencies (such as the Euro, Pound Sterling, Japanese Yen, and Chinese Yuan) held within the reserve portfolio. The USD/INR exchange rate line plot represents the period-average spot exchange rate calculated across all trading days within each quarter. In accordance with currency conventions, an upward trend or higher value in the USD/INR exchange rate denotes a depreciation (weakness) of the Indian Rupee against the US Dollar."),
-
+    subtitle=("From Q1 2023 to Q3 2026, reserves rose US$XXXbn to US$XXXbn "
+              "(FCA +US$XXXbn, gold +US$XXXbn); USD/INR climbed X.X%, signalling "
+              "rupee weakness. In Q3 2026, reserves rose US$XXbn quarter-on-quarter, "
+              "led by FCA (+US$XX.Xbn) and gold (+US$XX.Xbn). On DD Mon, FCA made up "
+              "XX.X% of reserves, gold XX.X%, SDRs X.X% and RTP X.X%."),
+    note=("Note: Stacked bars show foreign currency assets, gold, SDRs and India's "
+          "reserve tranche position in the IMF (RTP), in US$ billions. Quarterly bars "
+          "use each period's final available weekly observation (the latest period may "
+          "be partial); USD/INR is the quarterly average. A higher USD/INR rate means "
+          "a weaker rupee."),
     source="Source: Reserve Bank of India via DBIE; USD/INR: Federal Reserve via FRED",
-    debug=False,   # set True to see the grey plot area and orange margin lines
+    debug=False,   # True shows the grey plot area and orange margin lines
 )
 
-# ---------- plot ----------
-ax = f.add_axes()
-ax2 = ax.twinx()
+# ---------- themed plot ----------
+ax, ax2 = f.add_axes(twin=True)
 
-x = np.arange(n)
-colors = ["#1F4E79", "#C9A227", "#7F7F7F", "#F17000"]
-bottom = np.zeros(n)
-for vals, c in zip([fca, gold, sdr, rtp], colors):
-    ax.bar(x, vals, bottom=bottom, color=c, width=0.7)
-    bottom += vals
+f.stacked_bars(
+    ax, x, [fca, gold, sdr, rtp],
+    labels=["Foreign currency assets (FCA)", "Gold reserves", "SDRs",
+            "IMF Reserve Tranche Position (RTP)"],
+    width=34, partial_last=True,          # width in days, since x is a date axis
+)
+f.line(ax2, x, usdinr, label="USD/INR (quarterly average)")
 
-ax2.plot(x, usdinr, color="#000000", lw=2.5, marker="o", ms=5)
+# axis limits are yours to choose; fit() only sizes the outside
+ax.set_ylim(0, 800)
+ax2.set_ylim(82, 96)
+ax.set_xlim(x[0] - 70, x[-1] + 70)
 
-ax.set_xticks(x)
-ax.set_xticklabels(quarters, rotation=45, ha="right", fontsize=12)
-ax.tick_params(axis="y", labelsize=12)
-ax2.tick_params(axis="y", labelsize=12)
-ax.set_ylabel("US$ billions", fontsize=13)
-ax2.set_ylabel("USD/INR", fontsize=13)
-ax.margins(x=0.01)
-for side in ("top",):
-    ax.spines[side].set_visible(False)
-    ax2.spines[side].set_visible(False)
+# year ticks, unlabelled quarterly bars (as in the reference)
+ax.xaxis.set_major_locator(mdates.YearLocator())
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+ax.yaxis.set_major_locator(plt_ticker := __import__("matplotlib.ticker", fromlist=["x"]).MultipleLocator(100))
+ax.yaxis.set_major_formatter(usd_bn)
+ax2.yaxis.set_major_locator(__import__("matplotlib.ticker", fromlist=["x"]).MultipleLocator(2))
+ax2.yaxis.set_major_formatter(inr)
+f.ylabels(ax, "Reserves (US$ billions)", ax2, "Indian rupees per US dollar")
 
-# Legend (drawn on ax2 so it sits above the bars and line)
-handles = [Patch(color=c) for c in colors] + [Line2D([0], [0], color="#000000", lw=2.5, marker="o")]
-labels = ["Foreign currency assets", "Gold", "SDRs", "Reserve tranche position (RTP)", "USD/INR (RHS)"]
-ax2.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 1.0),
-           ncol=5, frameon=False, fontsize=13)
-
-# ---------- fit axes + labels + legend into the plot area, then save ----------
-f.fit([ax, ax2])
+# ---------- legend at the bottom, fit everything into the plot area, save ----------
+f.fit()
 f.save("test_chart.png")
 print("Saved test_chart.png, plot area (l, t, w, h):", f.plot_rect_px)
