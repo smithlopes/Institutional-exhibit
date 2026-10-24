@@ -1,1 +1,1 @@
-# institutional-exhibit
+# Institutional-exhibit
