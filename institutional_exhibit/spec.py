@@ -5,7 +5,7 @@ from dataclasses import dataclass
 class Spec:
     """House-style constants. Frozen: assignment raises FrozenInstanceError."""
     font: tuple = ("Inter", "Helvetica", "Arial", "DejaVu Sans")
-    title_font: tuple = ("Inter ExtraBold", "Inter", "Helvetica", "Arial", "DejaVu Sans")
+    title_font: tuple = ("Inter ExtraBold",)
     title_weight: int = 800       # "Inter ExtraBold" only exists at weight 800
 
     # margins and gaps (px)
