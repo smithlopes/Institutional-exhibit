@@ -100,7 +100,7 @@ class Frame:
         note_top = H - S.margin_bottom - len(note) * S.footer_lh
         src_top = note_top - S.footer_gap - len(src) * S.footer_lh
 
-        # 22px measured from visible ink, not from the line boxes:
+        # Gaps measured from visible ink, not from the line boxes:
         #   top:    bottom of the last subtitle line's descenders -> plot area
         #   bottom: plot area -> top of the source line's capital letters
         self.plot_top = (sub_top + (len(sub) - 1) * S.subtitle_lh
@@ -260,6 +260,19 @@ class Frame:
                 target.x1 - (bb.x1 - x1), target.y1 - (bb.y1 - y1))
             for a in axes:
                 a.set_position([new.x0 / W, new.y0 / H, new.width / W, new.height / H])
+
+    # ---------- output ----------
+    def show(self):
+        """Render the frame and display it with plt.show(). Nothing is saved."""
+        import matplotlib.pyplot as plt
+        self.canvas.draw()
+        img = np.asarray(self.canvas.buffer_rgba())
+        fig = plt.figure(figsize=(self.width / self.dpi, self.height / self.dpi),
+                         dpi=self.dpi, facecolor=self.background)
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.imshow(img, interpolation="nearest", aspect="auto")
+        ax.axis("off")
+        plt.show()
 
     def save(self, path, **kw):
         self.fig.savefig(path, dpi=self.dpi, facecolor=self.background, **kw)
