@@ -5,7 +5,7 @@ from matplotlib import font_manager as fm
 
 _CANDIDATE_DIRS = [
     Path(__file__).parent / "fonts",          # bundled copies, if you add them
-    Path.home() / "Library" / "Fonts",         # macOS user fonts
+    Path.home() / "Library" / "fonts",         # macOS user fonts
     Path("/Library/Fonts"),
     Path.home() / ".fonts",
     Path.home() / ".local" / "share" / "fonts",
