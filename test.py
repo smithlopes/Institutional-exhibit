@@ -35,12 +35,16 @@ f = Frame(
               "(FCA +US$XXXbn, gold +US$XXXbn); USD/INR climbed X.X%, signalling "
               "rupee weakness. In Q3 2026, reserves rose US$XXbn quarter-on-quarter, "
               "led by FCA (+US$XX.Xbn) and gold (+US$XX.Xbn). On DD Mon, FCA made up "
-              "XX.X% of reserves, gold XX.X%, SDRs X.X% and RTP X.X%."),
+              "XX.X% of reserves, gold XX.X%, SDRs X.X% and RTP X.X%. "
+              "Total reserves currently cover approximately XX.X months of projected imports."),
+
     note=("Note: Stacked bars show foreign currency assets, gold, SDRs and India's "
           "reserve tranche position in the IMF (RTP), in US$ billions. Quarterly bars "
           "use each period's final available weekly observation (the latest period may "
           "be partial); USD/INR is the quarterly average. A higher USD/INR rate means "
-          "a weaker rupee."),
+          "a weaker rupee. "
+          "Data compiled from Reserve Bank of India (RBI) weekly statistical supplements."),
+
     source="Source: Reserve Bank of India via DBIE; USD/INR: Federal Reserve via FRED",
     debug=False,   # True shows the grey plot area and orange margin lines
 )

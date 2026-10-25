@@ -12,7 +12,7 @@ class Spec:
     margin_x: float = 60
     margin_top: float = 40
     margin_bottom: float = 40     # note end -> image bottom, always constant
-    gap: float = 22               # subtitle ink -> plot area, plot area -> source ink
+    gap: float = 30               # subtitle ink -> plot area, plot area -> source ink
     title_gap: float = 5.4        # title -> subtitle
     footer_gap: float = 2         # source -> note
 
