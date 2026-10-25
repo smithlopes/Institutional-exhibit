@@ -1,6 +1,6 @@
 [project]
 name = "institutional-exhibit"
-version = "0.4.0"
+version = "0.4.1"
 description = "Fixed-layout matplotlib frames and theme for report-ready charts"
 readme = "README.md"
 requires-python = ">=3.9"
