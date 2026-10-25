@@ -5,7 +5,7 @@ description = "Fixed-layout matplotlib frames and theme for report-ready charts"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "Your Name", email = "you@example.com" }]
+authors = [{ name = "Smith Lopes", email = "smith.lugia@gmail.com" }]
 dependencies = ["matplotlib>=3.7", "numpy", "fonttools>=4.40"]
 
 [build-system]
